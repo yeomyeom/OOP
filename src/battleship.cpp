@@ -160,7 +160,7 @@ private:
 	int do_point;
 	int move_point;
 public:
-	ship(){}
+	ship() {}
 	ship(string name_, int kind_, int x_, int y_, int compass_, int health_, int index_, int mp_) :kind(kind_), x(x_), y(y_), compass(compass_), health(health_), block(health_), index(index_), move_point(mp_), do_point(1) {
 		name = name_;
 		//mapsize에 따라서 unit(배ship) 갯수가 결정되고 unit 칸수=health(체력) unit 칸수에 비례해서 move_point와 공격력이 결정됨
@@ -224,7 +224,11 @@ public:
 		//move_point--;
 		return 1;
 	}
-	virtual int search() { return 1; }
+	virtual int search()
+	{ 
+		cout << "상대편 " << name <<"을 발견했습니다." << endl;
+		return 1; 
+	}
 	void move_ship(int direction)
 	{
 		if (direction == 0)//좌회전
@@ -273,19 +277,22 @@ public:
 	void comment() {
 		cout << "어느 동작을 할 것입니까? 1 : 정찰  2. 이동  다른값. 강제 종료" << endl;
 	}
-	int search()
-	{
-		cout << "상대편 군함을 발견했습니다." << endl;
-		return 1;
-	}
 };
 class ship_battleship :public ship {
 public:
-	ship_battleship(int x_, int y_, int compass_, int index_) :ship("전함", 2, x_, y_, compass_, 4, index_, 2) {}
+	ship_battleship(int x_, int y_, int compass_, int index_) :ship("전함", 2, x_, y_, compass_, 4, index_, 1) {}
 };
 class ship_patrol :public ship {
 public:
 	ship_patrol(int x_, int y_, int compass_, int index_) :ship("초계함", 3, x_, y_, compass_, 3, index_, 3) {}
+};
+class ship_submarin :public ship {
+public:
+	ship_submarin(int x_, int y_, int compass_, int index_) :ship("잠수함", 4, x_, y_, compass_, 2, index_, 1) {}
+	int search()
+	{
+		return 0;
+	}
 };
 
 class player {
@@ -299,7 +306,7 @@ private:
 public:
 	//vector<ship> ship_v;
 	//vector<ship>::iterator ship_index;
-	ship *ship_arr[(int)(MAPSIZE * UNIT_BALANCE) + 2];
+	ship * ship_arr[(int)(MAPSIZE * UNIT_BALANCE) + 2];
 	int ship_index;
 	int state;//멀티에서 쓸거
 	player(int id_, int bot_num_) : id(id_), bot_num(bot_num_), unit_num(0), state(0) {
@@ -354,16 +361,20 @@ public:
 			{
 				health = 4;
 			}
-			else
+			else if(input_kind == 3)
 			{
 				health = 3;
+			}
+			else
+			{
+				health = 2;
 			}
 			srand(time(NULL));
 			do {
 				x = rand() % MAPSIZE;
-				Sleep(100);
+				Sleep(1000);
 				y = rand() % MAPSIZE;
-				Sleep(100);
+				Sleep(1000);
 				c = rand() % 4;
 			} while (map_check(map, x, y, c, health) != 1);
 			unit_num++;
@@ -373,11 +384,15 @@ public:
 			}
 			else if (input_kind == 2)
 			{
-				ship_arr[ship_index]= new ship_battleship(x, y, c, unit_num);
+				ship_arr[ship_index] = new ship_battleship(x, y, c, unit_num);
+			}
+			else if(input_kind == 3)
+			{
+				ship_arr[ship_index] = new ship_patrol(x, y, c, unit_num);
 			}
 			else
 			{
-				ship_arr[ship_index]= new ship_patrol(x, y, c, unit_num);
+				ship_arr[ship_index] = new ship_submarin(x, y, c, unit_num);
 			}
 			drawship(*ship_arr[ship_index]);
 			ship_index++;
@@ -622,6 +637,11 @@ public:
 		else
 		{
 			result = ship_arr[i - 1]->search();
+			if (result == 0)//잠수함 탐지 못함
+			{
+				cout << x << " , " << y << "에 아무것도 없습니다." << endl;
+				i = 0;
+			}
 		}
 		Sleep(2000);
 		return i;
@@ -633,8 +653,8 @@ void make_ship_num(int *c, int *b, int *p, int *custom)//밸런스에 맞게 유닛들 생
 	cout << "생성할 전함들의 갯수는 " << endl;
 	*c = 1;//항공모함은 항상 1
 	*b = 2;
-	*p = 2;
-	*custom = 0;
+	*p = 1;
+	*custom = 1;
 	//일단 커스텀 객체는 0
 	/*do {
 	*b = rand() % (int)(MAPSIZE*UNIT_BALANCE/2);
@@ -663,7 +683,7 @@ void gamestart_single()
 	vector<othermap> ::iterator maps_index;
 	int who = 0;
 	make_ship_num(&c_num, &b_num, &p_num, &custom);
-	cout << c_num << b_num << p_num << endl;
+	cout << c_num << b_num << p_num <<custom<< endl;
 	for (int i = 0;i <= bot;i++)//0=본인 1~bot = bot갯수
 	{
 		player p(i, bot);
@@ -679,6 +699,10 @@ void gamestart_single()
 		for (j = 0;j < p_num;j++)
 		{
 			p_v[i].makeship(3);//ship 상속받은 ship_항공모함, ship_전함, ship_초계함이 들어갈 자리
+		}
+		for (j = 0;j < custom;j++)
+		{
+			p_v[i].makeship(4);
 		}
 		othermap map;
 		maps_v.push_back(map);//상대방이 사격했을때 해당 위치에 무엇이 있는지 알기 위한 빈 2차원 배열
@@ -790,7 +814,7 @@ void gamestart_single()
 					{
 						system("cls");
 						cout << who << " bot 진행 중입니다." << endl;
-						if (p_index->ship_arr[q]->gethealth() > 0) {//,배가 살아있는가?
+						if (p_index->ship_arr[q]->gethealth() > 0) {//배가 살아있는가?
 							input = rand() % 2;
 							if (input == 1)
 							{
@@ -925,7 +949,7 @@ void client(const char *ip, int *x, int *y)//message receive
 		closesocket(hsocket);
 		WSACleanup();
 	}
-	strlen=recv(hsocket, message, sizeof(message) - 1, 0);
+	strlen = recv(hsocket, message, sizeof(message) - 1, 0);
 	if (strlen == -1)
 	{
 		cout << "read fuc error" << endl;
@@ -962,7 +986,7 @@ void gamestart_multi()
 		const char *connect_ip = c_ip.c_str();
 		cout << connect_ip << " 로 연결 시도합니다." << endl;
 		make_ship_num(&c_num, &b_num, &p_num, &custom);
-		cout << c_num << b_num << p_num << endl;
+		cout << c_num << b_num << p_num <<custom<< endl;
 		player p(i, bot);
 		ship_battleship sb(5, 5, 0, 1);
 		for (j = 0;j < c_num;j++)
@@ -976,6 +1000,10 @@ void gamestart_multi()
 		for (j = 0;j < p_num;j++)
 		{
 			p.makeship(3);
+		}
+		for (j = 0;j < custom;j++)
+		{
+			p.makeship(4);
 		}
 		othermap map;//상대방이 사격했을때 해당 위치에 무엇이 있는지 알기 위한 빈 2차원 배열
 
@@ -1047,7 +1075,7 @@ void gamestart_multi()
 			}
 			count++;
 		}
-		cout <<"총 "<<count <<"척 중에서 "<<alive<<" 척이 살아남았습니다. \n player 승리" << endl;
+		cout << "총 " << count << "척 중에서 " << alive << " 척이 살아남았습니다. \n player 승리" << endl;
 	}
 	else
 	{
