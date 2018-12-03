@@ -1,8 +1,10 @@
 #include <iostream>
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
 #pragma comment(lib,"ws2_32.lib")
+#pragma comment(lib,"winmm.lib")
 #include <WinSock2.h>
 #include <Windows.h>
+#include <mmsystem.h>
 #include <stdio.h>
 #include <vector>
 #include <time.h>
@@ -150,7 +152,7 @@ public:
 };
 class ship {
 private:
-	string name;//깊은 복사가 아니라면 char형으로 바꿀 예정
+	string name;
 	int kind;
 	int x, y;
 	int compass;
@@ -270,6 +272,7 @@ public:
 	virtual void comment() {
 		cout << "어느 동작을 할 것입니까? 1 : 공격  2. 이동  다른값. 강제 종료" << endl;
 	}
+	virtual void sound() {}
 };
 class ship_carrier :public ship {
 public:
@@ -277,14 +280,80 @@ public:
 	void comment() {
 		cout << "어느 동작을 할 것입니까? 1 : 정찰  2. 이동  다른값. 강제 종료" << endl;
 	}
+	void sound() {
+		int i = rand() % 5;
+		if(i==0){
+			PlaySound("sound/carrier1.wav", 0, SND_ASYNC);
+		}
+		else if(i==1)
+		{
+			PlaySound("sound/carrier2.wav", 0, SND_ASYNC);
+		}
+		else if (i == 2)
+		{
+			PlaySound("sound/carrier3.wav", 0, SND_ASYNC);
+		}
+		else if (i == 3)
+		{
+			PlaySound("sound/carrier4.wav", 0, SND_ASYNC);
+		}
+		else
+		{
+			PlaySound("sound/carrier5.wav", 0, SND_ASYNC);
+		}
+	}
 };
 class ship_battleship :public ship {
 public:
 	ship_battleship(int x_, int y_, int compass_, int index_) :ship("전함", 2, x_, y_, compass_, 4, index_, 1) {}
+	void sound() {
+		int i = rand() % 5;
+		if (i == 0) {
+			PlaySound("sound/battleship1", 0, SND_ASYNC);
+		}
+		else if (i == 1)
+		{
+			PlaySound("sound/battleship2", 0, SND_ASYNC);
+		}
+		else if (i == 2)
+		{
+			PlaySound("sound/battleship3", 0, SND_ASYNC);
+		}
+		else if (i == 3)
+		{
+			PlaySound("sound/battleship4", 0, SND_ASYNC);
+		}
+		else
+		{
+			PlaySound("sound/battleship5", 0, SND_ASYNC);
+		}
+	}
 };
 class ship_patrol :public ship {
 public:
 	ship_patrol(int x_, int y_, int compass_, int index_) :ship("초계함", 3, x_, y_, compass_, 3, index_, 3) {}
+	void sound() {
+		int i = rand() % 5;
+		if (i == 0) {
+			PlaySound("sound/patrol1", 0, SND_ASYNC);
+		}
+		else if (i == 1)
+		{
+			PlaySound("sound/patrol2", 0, SND_ASYNC);
+		}
+		else if (i == 2)
+		{
+			PlaySound("sound/patrol3", 0, SND_ASYNC);
+		}
+		else if (i == 3)
+		{
+			PlaySound("sound/patrol4", 0, SND_ASYNC);
+		}
+		else
+		{
+			PlaySound("sound/patrol5", 0, SND_ASYNC);
+		}
+	}
 };
 class ship_submarin :public ship {
 public:
@@ -293,6 +362,28 @@ public:
 	{
 		return 0;
 	}
+	void sound() {
+		int i = rand() % 5;
+		if (i == 0) {
+			PlaySound("sound/submarin1", 0, SND_ASYNC);
+		}
+		else if (i == 1)
+		{
+			PlaySound("sound/submarin2", 0, SND_ASYNC);
+		}
+		else if (i == 2)
+		{
+			PlaySound("sound/submarin3", 0, SND_ASYNC);
+		}
+		else if (i == 3)
+		{
+			PlaySound("sound/submarin4", 0, SND_ASYNC);
+		}
+		else
+		{
+			PlaySound("sound/submarin5", 0, SND_ASYNC);
+		}
+	}
 };
 
 class player {
@@ -300,16 +391,12 @@ private:
 	int id;
 	int unit_max;//최대로 가질 수 있는 배의 수
 	int unit_num;//현재 가지고 있는 배의 수
-				 //int unit_index;//iterator 기능//unit_index 변수는 unit_num과 같은데 아직 모르겠음
 	int map[MAPSIZE][MAPSIZE];//player 본인의 맵
 	int bot_num;
 public:
-	//vector<ship> ship_v;
-	//vector<ship>::iterator ship_index;
 	ship * ship_arr[(int)(MAPSIZE * UNIT_BALANCE) + 2];
 	int ship_index;
-	int state;//멀티에서 쓸거
-	player(int id_, int bot_num_) : id(id_), bot_num(bot_num_), unit_num(0), state(0) {
+	player(int id_, int bot_num_) : id(id_), bot_num(bot_num_), unit_num(0) {
 		unit_max = (int)(MAPSIZE * UNIT_BALANCE) + 1;// 배를 최대로 만들 수 있는 수를 어떻게 해야할까?
 		initmap();
 		ship_index = 0;//ship_index 초기화
@@ -560,7 +647,7 @@ public:
 			}
 			if (map_check(map, x, y, compass, s.getblock()) == 1)//이거 확인하기 전에 내 정보를 지워야함 직진할때 이미 해당 칸에 숫자가 들어가 있어서(이동 전의 나) 충돌 판정 남 
 			{
-				cout << s.getindex() << " 배를 " << x << y << compass << " 로 이동시켰습니다." << endl;
+				cout << s.getindex() << " 배를 이동시켰습니다." << endl;
 				s.move_ship(direction);
 				*ship_arr[s.getindex() - 1] = s;//바뀐 ship의 위치 정보를 갱신한다.와 이거 -1 안해서 오류난거였네 GG
 				initmap();
@@ -591,6 +678,7 @@ public:
 
 		if (s.getkind() == 1)
 		{
+			PlaySound(TEXT("sound/search.wav"), 0, SND_ASYNC);
 			r = p->p_search(x, y);
 		}
 		else
@@ -613,6 +701,7 @@ public:
 		}
 		else
 		{
+			PlaySound(TEXT("sound/attack.wav"), 0, SND_ASYNC);
 			result = ship_arr[i - 1]->hit();
 			if (result == 0)
 			{
@@ -734,12 +823,11 @@ void gamestart_single()
 			}
 			else
 			{
-				//q = p_index->ship_index;
 				for (q = 0;q < p_index->get_unitmax();q++) //플래이어가 가지고 있는 모든 배들의 조종이 완료될때까지 반복
 				{
 					p_index->initmap();
 					for (tmp = 0;tmp < p_index->get_unitmax();tmp++) {
-						p_index->drawship(*(p_index->ship_arr[tmp]));//여기서 문제가 생길 수도 격침당한 배는 빼고 맵에 그림 ship 객체는 안지움 vector에 저장되서 삭제하려면 앞에 있는 애들 다 시 당겨 줘야함
+						p_index->drawship(*(p_index->ship_arr[tmp]));//격침당한 배는 빼고 맵에 그림 ship 객체는 안지움
 					}
 					if (who == 0)
 					{
@@ -756,6 +844,7 @@ void gamestart_single()
 						cout << "=======================" << endl;
 						p_index->showship(q);
 						if (p_index->ship_arr[q]->gethealth() > 0) {//배가 살아있는가?
+							p_index->ship_arr[q]->sound();
 							p_index->ship_arr[q]->comment();
 							cin >> input;
 							if (input == 1)
@@ -785,7 +874,7 @@ void gamestart_single()
 							else if (input == 2)
 							{
 								do {
-									cout << p_index->ship_arr[q]->getmove_point() << " 만큼 0 : 좌회전 1 :직진 2 : 우회전" << endl;
+									cout << p_index->ship_arr[q]->getmove_point() << " 만큼 (0 좌회전) (1 직진) (2 우회전)" << endl;
 									cin >> input;
 								} while (input != 0 && input != 1 && input != 2);
 								if (p_index->move(input, *(p_index->ship_arr[q])) == 1)
@@ -892,6 +981,7 @@ void server(int level)//message send
 	}
 	srand(time(NULL));
 	system("ipconfig");
+	system("arp -a");
 	cout << "플레이어 접속을 기다리고 있습니다." << endl;
 	for (int i = 0;i < MAX_TURN*level;i++)
 	{
@@ -981,6 +1071,7 @@ void gamestart_multi()
 		int xpos, ypos;
 		int alive = 0;
 		int count = 0;
+		system("arp -a");
 		cout << "공격자 IP 입력" << endl;
 		cin >> c_ip;
 		const char *connect_ip = c_ip.c_str();
@@ -1047,8 +1138,9 @@ void gamestart_multi()
 					p.showmap();
 					cout << "=======================" << endl;
 					p.showship(q);
+					p.ship_arr[q]->sound();
 					do {
-						cout << p.ship_arr[q]->getmove_point() << " 만큼 0 : 좌회전 1 :직진 2 : 우회전" << endl;
+						cout << p.ship_arr[q]->getmove_point() << " 만큼 (0 좌회전) (1 직진) (2 우회전)" << endl;
 						cin >> input;
 					} while (input != 0 && input != 1 && input != 2);
 					if (p.move(input, *(p.ship_arr[q])) == 1)
@@ -1100,7 +1192,7 @@ int main()
 	}
 	else if (user_input == 3)
 	{
-		cout << "tutorial" << endl;
+		//tutorial();
 	}
 	else
 	{
