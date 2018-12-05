@@ -11,13 +11,13 @@
 #include <random>
 #include <string>
 using namespace std;
-#define MAPSIZE 10//맵 사이즈를 내가 원하는대로 바꾸면 좋은데 계속 2차원 배열에서 변수 말고 상수 집어넣으라 하네;;;
+#define MAPSIZE 10
 #define UNIT_BALANCE 0.4
-#define MAX_TURN 5
+#define MAX_TURN 50
 int map_check(int m[][MAPSIZE], int x, int y, int c, int blocks)
 {
 	int tmp = 0;
-	if (c == 0)//북쪽
+	if (c == 0) //북쪽
 	{
 		if (y >= blocks)
 		{
@@ -37,7 +37,7 @@ int map_check(int m[][MAPSIZE], int x, int y, int c, int blocks)
 		}
 		else { return 0; }
 	}
-	else if (c == 1)//동쪽
+	else if (c == 1) //동쪽
 	{
 		if (x <= MAPSIZE - blocks)
 		{
@@ -57,7 +57,7 @@ int map_check(int m[][MAPSIZE], int x, int y, int c, int blocks)
 		}
 		else { return 0; }
 	}
-	else if (c == 2)//남쪽
+	else if (c == 2) //남쪽
 	{
 		if (y <= MAPSIZE - blocks)
 		{
@@ -77,7 +77,7 @@ int map_check(int m[][MAPSIZE], int x, int y, int c, int blocks)
 		}
 		else { return 0; }
 	}
-	else//서쪽
+	else //서쪽
 	{
 		if (x >= blocks)
 		{
@@ -98,14 +98,14 @@ int map_check(int m[][MAPSIZE], int x, int y, int c, int blocks)
 		else { return 0; }
 	}
 }
-class othermap {
+class othermap {// 다른 플레이어의 map을 표현하기 위한 클래스
 public:
 	int other_map[MAPSIZE][MAPSIZE];
 	othermap()
 	{
-		for (int i = 0;i < MAPSIZE;i++)
+		for (int i = 0; i < MAPSIZE; i++)
 		{
-			for (int j = 0;j < MAPSIZE;j++)
+			for (int j = 0; j < MAPSIZE; j++)
 			{
 				other_map[i][j] = 0;
 			}
@@ -113,9 +113,9 @@ public:
 	}
 	othermap(const othermap& c)
 	{
-		for (int i = 0;i < MAPSIZE;i++)
+		for (int i = 0; i < MAPSIZE; i++)
 		{
-			for (int j = 0;j < MAPSIZE;j++)
+			for (int j = 0; j < MAPSIZE; j++)
 			{
 				other_map[i][j] = c.other_map[i][j];
 			}
@@ -123,15 +123,15 @@ public:
 	}
 	void showothermap()
 	{
-		for (int i = 0;i < MAPSIZE;i++)
+		for (int i = 0; i < MAPSIZE; i++)
 		{
-			for (int j = 0;j < MAPSIZE;j++)
+			for (int j = 0; j < MAPSIZE; j++)
 			{
 				if (other_map[i][j] == 0)
 				{
 					cout << "□";
 				}
-				else
+				else // 공격이나 정찰당한 경우
 				{
 					cout << "■";
 				}
@@ -141,9 +141,9 @@ public:
 	}
 	void initothermap()
 	{
-		for (int i = 0;i < MAPSIZE;i++)
+		for (int i = 0; i < MAPSIZE; i++)
 		{
-			for (int j = 0;j < MAPSIZE;j++)
+			for (int j = 0; j < MAPSIZE; j++)
 			{
 				other_map[i][j] = 0;
 			}
@@ -165,7 +165,7 @@ public:
 	ship() {}
 	ship(string name_, int kind_, int x_, int y_, int compass_, int health_, int index_, int mp_) :kind(kind_), x(x_), y(y_), compass(compass_), health(health_), block(health_), index(index_), move_point(mp_), do_point(1) {
 		name = name_;
-		//mapsize에 따라서 unit(배ship) 갯수가 결정되고 unit 칸수=health(체력) unit 칸수에 비례해서 move_point와 공격력이 결정됨
+		//mapsize에 따라서 unit(배ship) 갯수가 결정되고 unit 칸수= health (처음 체력) 
 	}
 	ship(const ship& c) : kind(c.kind), x(c.x), y(c.y), compass(c.compass), health(c.health), block(c.block), index(c.index), do_point(c.do_point), move_point(c.move_point) {
 		name = c.name;
@@ -212,7 +212,7 @@ public:
 		return health;
 	}
 	//////get함수들//////
-	int hit()//인자가 뭐 필요한지 모르겠음
+	int hit()
 	{
 		health = health - 1;
 		cout << name << " 피격 당함" << endl;
@@ -221,19 +221,18 @@ public:
 		{
 			block = 0;
 			cout << name << " 격침" << endl;
-			return 0;//배 격침
+			return 0; // 배 격침
 		}
-		//move_point--;
 		return 1;
 	}
 	virtual int search()
-	{ 
-		cout << "상대편 " << name <<"을 발견했습니다." << endl;
-		return 1; 
+	{
+		cout << "상대편 " << name << "을 발견했습니다." << endl;
+		return 1;
 	}
 	void move_ship(int direction)
 	{
-		if (direction == 0)//좌회전
+		if (direction == 0) //좌회전
 		{
 			compass--;
 			if (compass < 0)
@@ -241,7 +240,7 @@ public:
 				compass = 3;
 			}
 		}
-		else if (direction == 1)//직진
+		else if (direction == 1) //직진
 		{
 			if (compass == 0)
 			{
@@ -260,7 +259,7 @@ public:
 				x -= move_point;
 			}
 		}
-		else//우회전
+		else //우회전
 		{
 			compass++;
 			if (compass >= 4)
@@ -270,7 +269,7 @@ public:
 		}
 	}
 	virtual void comment() {
-		cout << "어느 동작을 할 것입니까? 1 : 공격  2. 이동  다른값. 강제 종료" << endl;
+		cout << "어느 동작을 할 것입니까? (1 공격)   (2 이동)" << endl;
 	}
 	virtual void sound() {}
 };
@@ -278,14 +277,14 @@ class ship_carrier :public ship {
 public:
 	ship_carrier(int x_, int y_, int compass_, int index_) :ship("항공모함", 1, x_, y_, compass_, 5, index_, 1) {}
 	void comment() {
-		cout << "어느 동작을 할 것입니까? 1 : 정찰  2. 이동  다른값. 강제 종료" << endl;
+		cout << "어느 동작을 할 것입니까?  (1 정찰)   (2 이동)" << endl;
 	}
 	void sound() {
 		int i = rand() % 5;
-		if(i==0){
+		if (i == 0) {
 			PlaySound("sound/carrier1.wav", 0, SND_ASYNC);
 		}
-		else if(i==1)
+		else if (i == 1)
 		{
 			PlaySound("sound/carrier2.wav", 0, SND_ASYNC);
 		}
@@ -389,21 +388,22 @@ public:
 class player {
 private:
 	int id;
-	int unit_max;//최대로 가질 수 있는 배의 수
-	int unit_num;//현재 가지고 있는 배의 수
-	int map[MAPSIZE][MAPSIZE];//player 본인의 맵
+	int unit_max; //최대로 가질 수 있는 배의 수
+	int unit_num; //현재 가지고 있는 배의 수
+	int map[MAPSIZE][MAPSIZE]; //player 본인의 맵
 	int bot_num;
 public:
 	ship * ship_arr[(int)(MAPSIZE * UNIT_BALANCE) + 2];
 	int ship_index;
-	player(int id_, int bot_num_) : id(id_), bot_num(bot_num_), unit_num(0) {
-		unit_max = (int)(MAPSIZE * UNIT_BALANCE) + 1;// 배를 최대로 만들 수 있는 수를 어떻게 해야할까?
+	int state; //멀티에서 사용
+	player(int id_, int bot_num_) : id(id_), bot_num(bot_num_), unit_num(0), state(0) {
+		unit_max = (int)(MAPSIZE * UNIT_BALANCE) + 1;
 		initmap();
 		ship_index = 0;//ship_index 초기화
 	}
 	/*player(const player &c):id(c.id),unit_max(c.unit_max),unit_num(c.unit_num),unit_index(c.unit_index),bot_num(c.bot_num)
 	{
-	//copy constructer 생략 나중에 필요할지도....
+	//copy constructer 생략
 	}*/
 	//////생성자////////
 	int get_unitmax()
@@ -426,9 +426,9 @@ public:
 	void initmap()
 	{
 		int i, j;
-		for (i = 0;i < MAPSIZE;i++)
+		for (i = 0; i < MAPSIZE; i++)
 		{
-			for (j = 0;j < MAPSIZE;j++)
+			for (j = 0; j < MAPSIZE; j++)
 			{
 				map[i][j] = 0;
 			}
@@ -437,7 +437,6 @@ public:
 	void makeship(int input_kind)
 	{
 		int x, y, c, health;
-		//FILE *pt=fopen("/ships/ship_info.txt","r"); 파일로 읽어오고 싶다 수정하기 편하게
 		if (unit_max > unit_num)
 		{
 			if (input_kind == 1)
@@ -448,7 +447,7 @@ public:
 			{
 				health = 4;
 			}
-			else if(input_kind == 3)
+			else if (input_kind == 3)
 			{
 				health = 3;
 			}
@@ -473,7 +472,7 @@ public:
 			{
 				ship_arr[ship_index] = new ship_battleship(x, y, c, unit_num);
 			}
-			else if(input_kind == 3)
+			else if (input_kind == 3)
 			{
 				ship_arr[ship_index] = new ship_patrol(x, y, c, unit_num);
 			}
@@ -498,37 +497,37 @@ public:
 		int block = s.getblock();
 		int index = s.getindex();
 		int heal = s.gethealth();
-		if (heal <= 0) {//격침되면 맵에 안그림
-						//cout << "격침당한 배는 안그립니다." << endl;
+		if (heal <= 0) //격침되면 맵에 안그림
+		{
 			index = 0;
 		}
-		if (c == 0)
+		if (c == 0) // 북쪽
 		{
-			for (tmp = 0;tmp < block;tmp++)
+			for (tmp = 0; tmp < block; tmp++)
 			{
 				map[y][x] = index;
 				y--;
 			}
 		}
-		else if (c == 1)
+		else if (c == 1) // 동쪽
 		{
-			for (tmp = 0;tmp < block;tmp++)
+			for (tmp = 0; tmp < block; tmp++)
 			{
 				map[y][x] = index;
 				x++;
 			}
 		}
-		else if (c == 2)
+		else if (c == 2) // 남쪽
 		{
-			for (tmp = 0;tmp < block;tmp++)
+			for (tmp = 0; tmp < block; tmp++)
 			{
 				map[y][x] = index;
 				y++;
 			}
 		}
-		else
+		else // 서쪽
 		{
-			for (tmp = 0;tmp < block;tmp++)
+			for (tmp = 0; tmp < block; tmp++)
 			{
 				map[y][x] = index;
 				x--;
@@ -539,31 +538,31 @@ public:
 	{
 		int x, y;
 
-		for (y = 0;y < MAPSIZE;y++)
+		for (y = 0; y < MAPSIZE; y++)
 		{
-			for (x = 0;x < MAPSIZE;x++)
+			for (x = 0; x < MAPSIZE; x++)
 			{
-				if (map[y][x] == 0)
+				if (map[y][x] == 0) // 빈 공간
 				{
 					cout << "□";
 				}
-				else if (map[y][x] == 1)
+				else if (map[y][x] == 1) // 첫 번째 ship
 				{
 					cout << " 1";
 				}
-				else if (map[y][x] == 2)
+				else if (map[y][x] == 2) // 두 번째 ship
 				{
 					cout << " 2";
 				}
-				else if (map[y][x] == 3)
+				else if (map[y][x] == 3) // 세 번째 ship
 				{
 					cout << " 3";
 				}
-				else if (map[y][x] == 4)
+				else if (map[y][x] == 4) // 네 번째 ship
 				{
 					cout << " 4";
 				}
-				else if (map[y][x] == 5)
+				else if (map[y][x] == 5) // 다섯 번째 ship
 				{
 					cout << " 5";
 				}
@@ -578,16 +577,33 @@ public:
 	void showship(int index)
 	{
 		//vector에 있는 정보들 출력
-		cout << ship_arr[index]->getindex() << "번째 함선 : " << ship_arr[index]->getname() << endl;
-		cout << "체력 : " << ship_arr[index]->gethealth() << endl;
-		cout << "위치 : " << ship_arr[index]->getx() << ship_arr[index]->gety() << ship_arr[index]->getcompass() << endl;
+		string com;
+		cout << ship_arr[index]->getindex() << "번째 함선: " << ship_arr[index]->getname() << endl;
+		cout << "체력: " << ship_arr[index]->gethealth() << endl;
+		if (ship_arr[index]->getcompass() == 0)
+		{
+			com = "북";
+		}
+		else if (ship_arr[index]->getcompass() == 1)
+		{
+			com = "동";
+		}
+		else if (ship_arr[index]->getcompass() == 2)
+		{
+			com = "남";
+		}
+		else
+		{
+			com = "서";
+		}
+		cout << "위치: " << " x좌표: " << ship_arr[index]->getx() << " y좌표: " << ship_arr[index]->gety() << " 방향: " << com << endl;
 	}
-	void erasemap(int index)//move 함수를 쓸때 move 전에 ship에 대한 잔상이 map에 남아 있어서 충돌판정을 함 그래서 이동 전에 내 잔상부터 지우는 작업 필요
+	void erasemap(int index) //move 함수를 쓸때 move 전에 ship에 대한 잔상이 map에 남아 있어서 충돌판정을 함 그래서 이동 전에 내 잔상부터 지우는 작업 필요
 	{
 		int x, y;
-		for (y = 0;y < MAPSIZE;y++)
+		for (y = 0; y < MAPSIZE; y++)
 		{
-			for (x = 0;x < MAPSIZE;x++)
+			for (x = 0; x < MAPSIZE; x++)
 			{
 				if (map[y][x] == index)
 				{
@@ -598,6 +614,7 @@ public:
 	}
 	int move(int direction, ship s)
 	{
+		string com;
 		int compass = s.getcompass();
 		int x = s.getx();
 		int y = s.gety();
@@ -605,29 +622,29 @@ public:
 		int mp = s.getmove_point();
 		erasemap(s.getindex());
 		if (dp > 0) {
-			if (direction == 0)//좌회전
+			if (direction == 0) //좌회전
 			{
 				compass--;
-				if (compass < 0)
+				if (compass < 0) // 이전에 북쪽이었던 경우
 				{
-					compass = 3;
+					compass = 3; // 서쪽 가리킴
 				}
 			}
-			else if (direction == 1)//직진
+			else if (direction == 1) // 직진
 			{
-				if (compass == 0)
+				if (compass == 0) // 북쪽
 				{
 					y -= mp;
 				}
-				else if (compass == 1)
+				else if (compass == 1) // 동쪽
 				{
 					x += mp;
 				}
-				else if (compass == 2)
+				else if (compass == 2) // 남쪽
 				{
 					y += mp;
 				}
-				else
+				else // 서쪽
 				{
 					x -= mp;
 				}
@@ -635,9 +652,9 @@ public:
 			else if (direction == 2)//우회전
 			{
 				compass++;
-				if (compass >= 4)
+				if (compass >= 4) // 이전에 서쪽이었던 경우
 				{
-					compass = 0;
+					compass = 0; // 북쪽
 				}
 			}
 			else
@@ -645,13 +662,31 @@ public:
 				cout << "방향 오류" << endl;
 				return 0;
 			}
-			if (map_check(map, x, y, compass, s.getblock()) == 1)//이거 확인하기 전에 내 정보를 지워야함 직진할때 이미 해당 칸에 숫자가 들어가 있어서(이동 전의 나) 충돌 판정 남 
+			//이거 확인하기 전에 내 정보를 지워야함 직진할때 이미 해당 칸에 숫자가 들어가 있어서(이동 전의 나) 충돌 판정 남
+			if (map_check(map, x, y, compass, s.getblock()) == 1)
 			{
-				cout << s.getindex() << " 배를 이동시켰습니다." << endl;
+
+				if (compass == 0)
+				{
+					com = "북";
+				}
+				else if (compass == 1)
+				{
+					com = "동";
+				}
+				else if (compass == 2)
+				{
+					com = "남";
+				}
+				else
+				{
+					com = "서";
+				}
+				//cout << s.getindex() << " 배를 " << " x좌표 : " << x << " y좌표 : " << y << " 방향 : " << com << " 로 이동시켰습니다." << endl;
 				s.move_ship(direction);
-				*ship_arr[s.getindex() - 1] = s;//바뀐 ship의 위치 정보를 갱신한다.와 이거 -1 안해서 오류난거였네 GG
+				*ship_arr[s.getindex() - 1] = s; //바뀐 ship의 위치 정보를 갱신한다.
 				initmap();
-				for (int i = 0; i < unit_max;i++)
+				for (int i = 0; i < unit_max; i++)
 				{
 					drawship(*ship_arr[i]);
 				}
@@ -659,7 +694,7 @@ public:
 			}
 			else
 			{
-				for (int i = 0; i < unit_max;i++)
+				for (int i = 0; i < unit_max; i++)
 				{
 					drawship(*ship_arr[i]);
 				}
@@ -672,16 +707,16 @@ public:
 			cout << "배의 행동력을 다 사용했습니다." << endl;
 		}
 	}
-	int attack(int x, int y, player *p, ship s)//좌표, 공격 당하는 애, 공격을 하는애
+	int attack(int x, int y, player *p, ship s) //좌표, 공격 당하는 애, 공격을 하는애
 	{
 		int r;
 
-		if (s.getkind() == 1)
+		if (s.getkind() == 1) // 배가 항공모함인 경우
 		{
 			PlaySound(TEXT("sound/search.wav"), 0, SND_ASYNC);
 			r = p->p_search(x, y);
 		}
-		else
+		else // 배가 항공모함이 아닌 경우
 		{
 			r = p->p_hit(x, y);
 			if (r != 0)
@@ -726,7 +761,7 @@ public:
 		else
 		{
 			result = ship_arr[i - 1]->search();
-			if (result == 0)//잠수함 탐지 못함
+			if (result == 0) //잠수함 탐지 못함
 			{
 				cout << x << " , " << y << "에 아무것도 없습니다." << endl;
 				i = 0;
@@ -740,16 +775,10 @@ void make_ship_num(int *c, int *b, int *p, int *custom)//밸런스에 맞게 유닛들 생
 {
 	srand(time(NULL));
 	cout << "생성할 전함들의 갯수는 " << endl;
-	*c = 1;//항공모함은 항상 1
-	*b = 2;
-	*p = 1;
-	*custom = 1;
-	//일단 커스텀 객체는 0
-	/*do {
-	*b = rand() % (int)(MAPSIZE*UNIT_BALANCE/2);
-	Sleep(2000);
-	*p = rand() % (int)(MAPSIZE*UNIT_BALANCE/2);
-	} while ((*b) + (*p) + (*custom) > (int)(MAPSIZE*UNIT_BALANCE));*/
+	*c = 1; //항공모함은 항상 1
+	*b = (int)MAPSIZE*UNIT_BALANCE*0.5; //전함은 MAPSIZE * UNIT_MAX * 0.5
+	*p = (int)MAPSIZE*UNIT_BALANCE*0.25; //초계함은 MAPSIZE * UNIT_MAX * 0.25
+	*custom = (int)MAPSIZE*UNIT_BALANCE*0.25;; // 잠수함은 MAPSIZE * UNIT_MAX * 0.25
 }
 void gamestart_single()
 {
@@ -758,7 +787,7 @@ void gamestart_single()
 	int bot;
 	int c_num, b_num, p_num, custom;
 	int alive;
-	cout << "Single playe" << endl;
+	cout << "Single play" << endl;
 	cout << "Map Size " << MAPSIZE << endl;
 	cout << "How many bots? : ";
 	cin >> bot;
@@ -768,39 +797,42 @@ void gamestart_single()
 	//player p[bots];
 	vector<player> p_v;
 	vector<player>::iterator p_index;
-	vector<othermap> maps_v;//맞았는지 안맞았는지 보여주는 map vector 다른사람이 쏘는 것도 볼 수 있다.
+	vector<othermap> maps_v; //맞았는지 안맞았는지 보여주는 map vector 다른사람이 쏘는 것도 볼 수 있다.
 	vector<othermap> ::iterator maps_index;
 	int who = 0;
 	make_ship_num(&c_num, &b_num, &p_num, &custom);
-	cout << c_num << b_num << p_num <<custom<< endl;
-	for (int i = 0;i <= bot;i++)//0=본인 1~bot = bot갯수
+	cout << "항공모함 수 : " << c_num << endl;
+	cout << "전함 수 : " << b_num << endl;
+	cout << "초계함 수 : " << p_num << endl;
+	cout << "잠수함 수 : " << custom << endl;
+	for (i = 0; i <= bot; i++) //0=본인 1 ~ bot = bot갯수
 	{
 		player p(i, bot);
 		p_v.push_back(p);
-		for (j = 0;j < c_num;j++)
+		for (j = 0; j < c_num; j++)
 		{
-			p_v[i].makeship(1);//ship 상속받은 ship_항공모함, ship_전함, ship_초계함이 들어갈 자리
+			p_v[i].makeship(1); //ship 상속받은 ship_항공모함이 들어갈 자리
 		}
-		for (j = 0;j < b_num;j++)
+		for (j = 0; j < b_num; j++)
 		{
-			p_v[i].makeship(2);//ship 상속받은 ship_항공모함, ship_전함, ship_초계함이 들어갈 자리
+			p_v[i].makeship(2); //ship 상속받은 ship_전함이 들어갈 자리
 		}
-		for (j = 0;j < p_num;j++)
+		for (j = 0; j < p_num; j++)
 		{
-			p_v[i].makeship(3);//ship 상속받은 ship_항공모함, ship_전함, ship_초계함이 들어갈 자리
+			p_v[i].makeship(3); //ship 상속받은 ship_초계함이 들어갈 자리
 		}
-		for (j = 0;j < custom;j++)
+		for (j = 0; j < custom; j++)
 		{
-			p_v[i].makeship(4);
+			p_v[i].makeship(4); //ship 상속받은 ship_잠수함이 들어갈 자리
 		}
 		othermap map;
-		maps_v.push_back(map);//상대방이 사격했을때 해당 위치에 무엇이 있는지 알기 위한 빈 2차원 배열
+		maps_v.push_back(map); // 상대방이 사격했을때 해당 위치에 무엇이 있는지 알기 위한 빈 2차원 배열
 	}
 	while (turn < MAX_TURN)
 	{
-		if (alive == 1)//단 한명만 살아남으면 승리
+		if (alive == 1) // 단 한명만 살아남으면 승리
 		{
-			for (p_index = p_v.begin();p_index != p_v.end();p_index++) {
+			for (p_index = p_v.begin(); p_index != p_v.end(); p_index++) {
 				if (p_index->ship_arr[0]->gethealth() != 0)
 				{
 					cout << "P" << p_index->getid() << " 가 승리했습니다." << endl;
@@ -809,10 +841,10 @@ void gamestart_single()
 			return;
 		}
 		alive = bot + 1;
-		for (p_index = p_v.begin();p_index != p_v.end();p_index++) //모든 플레이어가 완료할때까지 반복
+		for (p_index = p_v.begin(); p_index != p_v.end(); p_index++) // 모든 플레이어가 완료할때까지 반복
 		{
 			who = who % (bot + 1);
-			if (p_index->ship_arr[0]->gethealth() <= 0)//패배 조건 첫번째(항공모함) 전함이 격침되었을때
+			if (p_index->ship_arr[0]->gethealth() <= 0) // 패배 조건 첫번째(항공모함) 전함이 격침되었을때
 			{
 				alive--;
 				cout << "Player " << who << "가 패배했습니다." << endl;
@@ -823,44 +855,66 @@ void gamestart_single()
 			}
 			else
 			{
-				for (q = 0;q < p_index->get_unitmax();q++) //플래이어가 가지고 있는 모든 배들의 조종이 완료될때까지 반복
+				//q = p_index->ship_index;
+				for (q = 0; q < p_index->get_unitmax(); q++) //플래이어가 가지고 있는 모든 배들의 조종이 완료될때까지 반복
 				{
 					p_index->initmap();
-					for (tmp = 0;tmp < p_index->get_unitmax();tmp++) {
-						p_index->drawship(*(p_index->ship_arr[tmp]));//격침당한 배는 빼고 맵에 그림 ship 객체는 안지움
+					for (tmp = 0; tmp < p_index->get_unitmax(); tmp++) {
+						//여기서 문제가 생길 수도 격침당한 배는 빼고 맵에 그림 ship 객체는 안지움 vector에 저장되서 삭제하려면 앞에 있는 애들 당겨 줘야함
+						p_index->drawship(*(p_index->ship_arr[tmp]));
 					}
-					if (who == 0)
+					if (who == 0) // 플레이어의 차례
 					{
-						for (i = 0;i <= bot;i++)
+						for (i = 0; i <= bot; i++)
 						{
-							cout << "P" << i << endl;
-							cout << "=======================" << endl;
-							maps_v[i].showothermap();
-							cout << "=======================" << endl;
+							if (p_v[i].ship_arr[0]->gethealth() >= 1) // 이미 패배한 플레이어의 맵은 출력 안함
+							{
+								cout << "P" << i << endl;
+								cout << "=======================" << endl;
+								maps_v[i].showothermap();
+								cout << "=======================" << endl;
+							}
 						}
 						cout << "P" << who << endl;
 						cout << "=======================" << endl;
 						p_index->showmap();
 						cout << "=======================" << endl;
 						p_index->showship(q);
-						if (p_index->ship_arr[q]->gethealth() > 0) {//배가 살아있는가?
+						if (p_index->ship_arr[q]->gethealth() > 0) // 배가 살아있으면 공격 혹은 이동
+						{
 							p_index->ship_arr[q]->sound();
-							p_index->ship_arr[q]->comment();
-							cin >> input;
-							if (input == 1)
+							do {
+								p_index->ship_arr[q]->comment();
+								cin >> input;
+							} while (input < 1 || input > 2); // 공격, 이동 중에 선택
+
+							if (input == 1) // 공격
 							{
 								do {
-									cout << "공격할 플레이어는? (최대) " << bot << endl;
+									cout << "공격할 플레이어는? (최대 : " << bot << ") : ";
 									cin >> p;
 								} while (p > bot || p < 0);
 								p_index->ship_arr[q]->getkind();
 								do {
 									cout << "공격할 좌표를 입력하시오 : " << endl;
 									cout << "X 좌표 : ";
-									cin >> xpos;
-									cout << "\nY 좌표 : ";
+									cin  >>  xpos;
+									if (cin.fail())
+									{
+										cin.clear();
+										cin.ignore(256, '\n');
+									}
+								} while ((xpos > MAPSIZE || xpos < 0));
+								do {
+									cout << endl;
+									cout << "Y 좌표 : ";
 									cin >> ypos;
-								} while ((xpos > MAPSIZE || xpos < 0) && (ypos > MAPSIZE || ypos < 0));
+									if (cin.fail())
+									{
+										cin.clear();
+										cin.ignore(256, '\n');
+									}
+								} while ((ypos > MAPSIZE || ypos < 0));
 								tmp = p_index->attack(xpos, ypos, &p_v[p], *(p_index->ship_arr[q])); //p번째에 있는 플레이어 공격 p_v는 1부터 시작이 아니라 0부터 시작이다.
 								if (tmp != 0)
 								{
@@ -871,10 +925,10 @@ void gamestart_single()
 									maps_v[p].other_map[ypos][xpos] = 0;
 								}
 							}
-							else if (input == 2)
+							else if (input == 2) // 이동
 							{
 								do {
-									cout << p_index->ship_arr[q]->getmove_point() << " 만큼 (0 좌회전) (1 직진) (2 우회전)" << endl;
+									cout << p_index->ship_arr[q]->getmove_point() << " 만큼 (0 좌회전)  (1 직진)  (2 우회전)" << endl;
 									cin >> input;
 								} while (input != 0 && input != 1 && input != 2);
 								if (p_index->move(input, *(p_index->ship_arr[q])) == 1)
@@ -886,12 +940,8 @@ void gamestart_single()
 									cout << "해당 위치로 이동이 불가능 합니다." << endl;
 								}
 							}
-							else
-							{
-								return;//강제 종료
-							}
 						}
-						else
+						else // 배가 격침된 경우
 						{
 							cout << "격침된 배입니다." << endl;
 						}
@@ -911,7 +961,9 @@ void gamestart_single()
 								Sleep(1000);
 								ypos = rand() % MAPSIZE;
 								Sleep(1000);
-								p = rand() % (bot + 1);
+								do {
+									p = rand() % (bot + 1);
+								} while (p_v[p].ship_arr[0]->gethealth() <= 0); // 공격할 플레이어가 이미 패배한 경우 다시 플레이어 선택
 								tmp = p_index->attack(xpos, ypos, &p_v[p], *(p_index->ship_arr[q]));
 								if (tmp != 0)
 								{
@@ -930,7 +982,7 @@ void gamestart_single()
 					}
 				}
 			}
-			who++;
+			who++; // 차례 넘김
 			cout << "P" << p_index->getid() << " 차례가 종료되었습니다." << endl;
 		}
 		turn++;
@@ -939,12 +991,12 @@ void gamestart_single()
 	cout << "50턴이 넘었습니다. 경기를 종료합니다." << endl;
 	//4. 반복시작
 	//   1. ship vector에 1번째 있는 배를 움직일 것인가 공격할 것인가
-	//   2. 움직이면 방향(0왼 1직진 2오), 공격할꺼면 공격 위치와 공격할 플레이어(x,y, player)
-	//   3. 행동을 마쳤으면(do_point ==0) 다음 ship vector에 2번째 있는 ship 객체로 넘어감
+	//   2. 움직이면 방향(0왼 1직진 2오) 선택, 공격한다면 공격 위치와 공격할 플레이어(x,y, player) 선택
+	//   3. 행동을 마쳤으면(do_point ==0) 다음 ship vector에 있는 ship 객체로 넘어감
 	//   4. ship vector에 있는 모든 ship들의 행동을 결정한 후 현재 있는 map을 othermap_v에 복사함
 	//4. 반복시작(멀티)
 }
-void server(int level)//message send
+void server(int level) //message send
 {
 	WSADATA wsadata;
 	SOCKET hservsocket;
@@ -981,9 +1033,8 @@ void server(int level)//message send
 	}
 	srand(time(NULL));
 	system("ipconfig");
-	system("arp -a");
 	cout << "플레이어 접속을 기다리고 있습니다." << endl;
-	for (int i = 0;i < MAX_TURN*level;i++)
+	for (int i = 0; i < MAX_TURN*level; i++)
 	{
 		sizeclntaddr = sizeof(clntaddr);
 		hclntsocket = accept(hservsocket, (SOCKADDR *)&clntaddr, &sizeclntaddr);//연결 요청 수락
@@ -1001,7 +1052,7 @@ void server(int level)//message send
 		Sleep(3000);
 		y = rand() % MAPSIZE;
 		message[1] = (char)y;
-		cout << (int)message[0] << (int)message[1] << "를 전송합니다." << endl;
+		cout << "x 좌표 : " << (int)message[0] << " y 좌표 : " << (int)message[1] << "를 전송합니다." << endl; // 수비자의 map의 해당 좌표로 포격
 		send(hclntsocket, message, sizeof(message), 0);//데이터 전송
 		closesocket(hclntsocket);
 	}
@@ -1054,15 +1105,15 @@ void gamestart_multi()
 {
 	int input;
 	string c_ip;
-	int level = (int)MAPSIZE / 2;
+	int level = 5;
 	cout << "1. 공격 2. 수비 (강제종료는 다른 숫자)" << endl;
 	cin >> input;
-	if (input == 1)
+	if (input == 1) // 공격 선택
 	{
 		cout << "난이도 " << level << "서버 open" << endl;
 		server(level);
 	}
-	else if (input == 2)
+	else if (input == 2) // 수비 선택
 	{
 		int turn = 0;
 		int i = 0;
@@ -1071,30 +1122,32 @@ void gamestart_multi()
 		int xpos, ypos;
 		int alive = 0;
 		int count = 0;
-		system("arp -a");
 		cout << "공격자 IP 입력" << endl;
 		cin >> c_ip;
 		const char *connect_ip = c_ip.c_str();
 		cout << connect_ip << " 로 연결 시도합니다." << endl;
 		make_ship_num(&c_num, &b_num, &p_num, &custom);
-		cout << c_num << b_num << p_num <<custom<< endl;
+		cout << "항공모함 수 : " << c_num << endl;
+		cout << "전함 수 : " << b_num << endl;
+		cout << "초계함 수 : " << p_num << endl;
+		cout << "잠수함 수 : " << custom << endl;
 		player p(i, bot);
-		ship_battleship sb(5, 5, 0, 1);
-		for (j = 0;j < c_num;j++)
+		ship_battleship sb(5, 5, 0, 1); // 수비자의 map으로 포격을 날리는 전함
+		for (j = 0; j < c_num; j++)
 		{
-			p.makeship(1);//ship 상속받은 ship_항공모함, ship_전함, ship_초계함이 들어갈 자리
+			p.makeship(1); //ship 상속받은 ship_항공모함이 들어갈 자리
 		}
-		for (j = 0;j < b_num;j++)
+		for (j = 0; j < b_num; j++)
 		{
-			p.makeship(2);
+			p.makeship(2); //ship 상속받은 ship_전함이 들어갈 자리
 		}
-		for (j = 0;j < p_num;j++)
+		for (j = 0; j < p_num; j++)
 		{
-			p.makeship(3);
+			p.makeship(3); // ship 상속받은 ship_초계함이 들어갈 자리
 		}
-		for (j = 0;j < custom;j++)
+		for (j = 0; j < custom; j++)
 		{
-			p.makeship(4);
+			p.makeship(4); // ship 상속받은 ship_잠수함이 들어갈 자리
 		}
 		othermap map;//상대방이 사격했을때 해당 위치에 무엇이 있는지 알기 위한 빈 2차원 배열
 
@@ -1109,26 +1162,26 @@ void gamestart_multi()
 			}
 			else
 			{
-				for (j = 0;j < level;j++)
+				for (j = 0; j < level; j++)
 				{
 					cout << "서버 " << connect_ip << "로 연결 요청중입니다." << endl;
 					client(connect_ip, &xpos, &ypos);
 					cout << "포격이 날라옵니다" << endl;
-					tmp = p.attack(xpos, ypos, &p, sb); //p번째에 있는 플레이어 공격 p_v는 1부터 시작이 아니라 0부터 시작이다.
-					if (tmp != 0)
+					tmp = p.attack(xpos, ypos, &p, sb); //sb 전함으로 수비자 player p의 map으로 포격이 날라오는 것처럼 표현
+					if (tmp != 0) // 포격에 맞은 경우
 					{
 						map.other_map[ypos][xpos] = 1;
 					}
-					else
+					else // 포격을 피한 경우
 					{
 						map.other_map[ypos][xpos] = 0;
 					}
 				}
 				system("cls");
-				for (q = 0;q < p.get_unitmax();q++) //플래이어가 가지고 있는 모든 배들의 조종이 완료될때까지 반복
+				for (q = 0; q < p.get_unitmax(); q++) //플래이어가 가지고 있는 모든 배들의 조종이 완료될때까지 반복
 				{
 					p.initmap();
-					for (tmp = 0;tmp < p.get_unitmax();tmp++) {
+					for (tmp = 0; tmp < p.get_unitmax(); tmp++) {
 						p.drawship(*p.ship_arr[tmp]);//격침당한 배는 빼고 맵에 그림 ship 객체는 안지움 vector에 저장되서 삭제하려면 앞에 있는 애들 다 시 당겨 줘야함
 					}
 					cout << "=======================" << endl;
@@ -1140,8 +1193,13 @@ void gamestart_multi()
 					p.showship(q);
 					p.ship_arr[q]->sound();
 					do {
-						cout << p.ship_arr[q]->getmove_point() << " 만큼 (0 좌회전) (1 직진) (2 우회전)" << endl;
+						cout << p.ship_arr[q]->getmove_point() << " 만큼 (0 좌회전)  (1 직진)  (2 우회전)" << endl;
 						cin >> input;
+						if (cin.fail())
+						{
+							cin.clear();
+							cin.ignore(256, '\n');
+						}
 					} while (input != 0 && input != 1 && input != 2);
 					if (p.move(input, *(p.ship_arr[q])) == 1)
 					{
@@ -1159,7 +1217,8 @@ void gamestart_multi()
 			cout << "P" << p.getid() << " 차례가 종료되었습니다." << endl;
 			turn++;
 		}
-		for (q = 0;q < p.get_unitmax();q++) {
+		//p.get_unitmax()중 몇 척(alive 변수 값)이 살아남았는지 표현
+		for (q = 0; q < p.get_unitmax(); q++) {
 			p.showship(q);
 			if (p.ship_arr[q]->gethealth() > 0)
 			{
@@ -1167,7 +1226,8 @@ void gamestart_multi()
 			}
 			count++;
 		}
-		cout << "총 " << count << "척 중에서 " << alive << " 척이 살아남았습니다. \n player 승리" << endl;
+		cout << "총 " << count << "척 중에서 " << alive << " 척이 살아남았습니다." << endl;
+		cout << "player 승리" << endl;
 	}
 	else
 	{
@@ -1178,25 +1238,56 @@ void gamestart_multi()
 }
 int main()
 {
-	//system("mode con cols=75 lines=60");
+	system("mode con cols=80 lines=62");
 	int user_input;
-	cout << "1. single play \n2. multi play \n3. tutorial" << endl;
-	cin >> user_input;
-	if (user_input == 1)
-	{
-		gamestart_single();
-	}
-	else if (user_input == 2)
-	{
-		gamestart_multi();
-	}
-	else if (user_input == 3)
-	{
-		//tutorial();
-	}
-	else
-	{
-		cout << "bye" << endl;
+	while (1 == 1) {
+		cout << "                 ■■■■■■■■■■■■■■■■■■■■" << endl;
+		cout << "                 ■                                    ■" << endl;
+		cout << "                 ■                                    ■" << endl;
+		cout << "                 ■           1. single play           ■" << endl;
+		cout << "                 ■                                    ■" << endl;
+		cout << "                 ■            2. multi play           ■" << endl;
+		cout << "                 ■                                    ■" << endl;
+		cout << "                 ■            3. game rule            ■" << endl;
+		cout << "                 ■                                    ■" << endl;
+		cout << "                 ■           other. game end          ■" << endl;
+		cout << "                 ■                                    ■" << endl;
+		cout << "                 ■                                    ■" << endl;
+		cout << "                 ■■■■■■■■■■■■■■■■■■■■\n" << endl;
+		cout << "                                메뉴 선택 : ";
+		cin >> user_input;
+		system("cls");
+		if (user_input == 1)
+		{
+			gamestart_single(); // 싱글플레이
+		}
+		else if (user_input == 2)
+		{
+			gamestart_multi(); // 멀티플레이
+		}
+		else if (user_input == 3) // 게임 설명
+		{
+			cout << "game rule " << endl << endl;
+			cout << "single play" << endl << endl;
+			cout << "1:1:1...의 턴제 전략 시뮬레이션 게임" << endl;
+			cout << "n * n의 맵" << endl;
+			cout << "항공모함(1척), 전함(n * 0.4 * 0.5척), 잠수함(n * 0.4 * 0.25대), 구축함(n * 0.4 * 0.25척) " << endl;
+			cout << "총 n * 0.4 + 1 척의 배가 등장한다." << endl;
+			cout << "처음 시작할때 배의 위치는 랜덤하게 생성된다. " << endl;
+			cout << "각 군함은 공격(또는 정찰) 과 이동 두가지 행동중 1가지만 선택해서 할 수 있다." << endl;
+			cout << "50턴 제한" << endl;
+			cout << "항공모함이 격침당하면 그 플레이어는 패배\n" << endl;
+			cout << "multi play" << endl << endl;
+			cout << "1:1 대결" << endl;
+			cout << "서버는 공격 플레이어는 수비" << endl;
+			cout << "공격자 공격 횟수는 서버 난이도(level) * MAX_TURN 입니다." << endl;
+			cout << "서버 난이도(level) == 한 턴당 공격자가 공격 하는 횟수" << endl;
+		}
+		else
+		{
+			cout << "bye" << endl;
+			break;
+		}
 	}
 	system("pause");
 	return 0;
