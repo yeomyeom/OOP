@@ -13,7 +13,7 @@
 using namespace std;
 #define MAPSIZE 10
 #define UNIT_BALANCE 0.4
-#define MAX_TURN 50
+#define MAX_TURN 5
 int map_check(int m[][MAPSIZE], int x, int y, int c, int blocks)
 {
 	int tmp = 0;
@@ -969,6 +969,10 @@ void gamestart_single()
 								{
 									maps_v[p].other_map[ypos][xpos] = 1;
 								}
+								else
+								{
+									maps_v[p].other_map[ypos][xpos] = 0;
+								}
 							}
 							else
 							{
@@ -1282,6 +1286,8 @@ int main()
 			cout << "서버는 공격 플레이어는 수비" << endl;
 			cout << "공격자 공격 횟수는 서버 난이도(level) * MAX_TURN 입니다." << endl;
 			cout << "서버 난이도(level) == 한 턴당 공격자가 공격 하는 횟수" << endl;
+			system("pause");
+			system("cls");
 		}
 		else
 		{
